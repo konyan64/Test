@@ -1,0 +1,19 @@
+jobs:
+  ssh-expose:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Run Docker SSH
+        run: |
+          docker run -d \
+            -p 2222:22 \
+            -e SSH_USER=ubuntu \
+            -e SSH_PASSWORD='ubuntu!23' \
+            ghcr.io/vevc/ubuntu:25.7.14
+
+      - name: Install Cloudflared
+        run: |
+          curl -L https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64 -o cloudflared
+          chmod +x cloudflared
+
+      - name: Expose port via Cloudflare
+        run: ./cloudflared tunnel --url tcp://localhost:2222
