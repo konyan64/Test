@@ -1,7 +1,7 @@
 name: Expose Docker SSH via Cloudflare Tunnel (TCP)
 
 on:
-  workflow_dispatch:
+  workflow_dispatch:  # allows manual run from the GitHub UI
 
 jobs:
   expose-ssh:
@@ -22,13 +22,17 @@ jobs:
           curl -L https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64 -o cloudflared
           chmod +x cloudflared
 
-      - name: Run TCP Cloudflare Tunnel and log output
+      - name: Start Cloudflare TCP Tunnel in background
         run: |
-          ./cloudflared tunnel --protocol tcp --url localhost:2222 > tunnel.log 2>&1 &
+          nohup ./cloudflared tunnel --protocol tcp --url localhost:2222 > tunnel.log 2>&1 &
           sleep 10
-          echo "===== Cloudflare Tunnel Output ====="
+
+      - name: Show Tunnel Address
+        run: |
+          echo "==== Cloudflare TCP Tunnel Output ===="
           cat tunnel.log | grep -Ei "tcp://|trycloudflare"
 
       - name: Keep Tunnel Alive
         run: |
+          echo "Tunnel is active. Leave this workflow running."
           tail -f /dev/null
