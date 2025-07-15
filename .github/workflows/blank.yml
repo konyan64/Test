@@ -1,10 +1,17 @@
+name: SSH Tunnel with Cloudflare
+
+on:
+  workflow_dispatch:  # ✅ Manual trigger
+
 jobs:
   ssh-expose:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Run Docker SSH
+      - name: Run Docker SSH container
         run: |
           docker run -d \
+            --name sshbox \
             -p 2222:22 \
             -e SSH_USER=ubuntu \
             -e SSH_PASSWORD='ubuntu!23' \
@@ -15,5 +22,7 @@ jobs:
           curl -L https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64 -o cloudflared
           chmod +x cloudflared
 
-      - name: Expose port via Cloudflare
-        run: ./cloudflared tunnel --url tcp://localhost:2222
+      - name: Expose SSH over Cloudflare Tunnel
+        run: |
+          echo "Starting Cloudflare Tunnel to SSH container..."
+          ./cloudflared tunnel --url tcp://localhost:2222
