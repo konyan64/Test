@@ -25,4 +25,8 @@ jobs:
       - name: Expose SSH over Cloudflare Tunnel
         run: |
           echo "Starting Cloudflare Tunnel to SSH container..."
-          ./cloudflared tunnel --url tcp://localhost:2222
+      - name: Start Cloudflare Tunnel
+        run: |
+           ./cloudflared tunnel --url tcp://localhost:2222 > tunnel.log &
+           sleep 10
+           cat tunnel.log
